@@ -4,10 +4,9 @@ package com.project.ecom_project.controller;
 import com.project.ecom_project.model.Product;
 import com.project.ecom_project.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Provider;
 import java.util.List;
@@ -20,13 +19,20 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @RequestMapping("/")
-    public String greet(){
-        return "Hello World";
-    }
+    @GetMapping("/product/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable int id){
+        Product product = productService.getProductById(id);
+        if(product !=null){
+            return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
+
+    }
     @GetMapping("/products")
-    public List<Product> getAllProducts(){
-           return productService.getAllProducts();
+    public ResponseEntity<List<Product>> getAllProducts(){
+           return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 }
