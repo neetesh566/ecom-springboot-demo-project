@@ -5,10 +5,13 @@ import com.project.ecom_project.model.Product;
 import com.project.ecom_project.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.IOException;
 import java.security.Provider;
 import java.util.List;
 
@@ -48,5 +51,45 @@ public class ProductController {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @GetMapping("/product/{productId}/image")
+    public ResponseEntity<byte[]> getImageByProductId(@PathVariable int productId){
+        Product product = productService.getProductById(productId);
+        byte[] imageFile = product.getImageData();
+
+        return  ResponseEntity.ok().contentType(MediaType.valueOf(product.getImageType()))
+                .body(imageFile);
+    }
+
+    @PutMapping("/product/{id}")
+    public ResponseEntity<String> updateProduct(@PathVariable int id, @RequestPart Product product, @RequestPart MultipartFile imageFile){
+        Product product1=null;
+        try{
+            product1= productService.updateProduct(id, product,imageFile);
+        }
+        catch(IOException e){
+            return new  ResponseEntity<>("Failed to update",HttpStatus.BAD_REQUEST);
+
+        }
+
+        if(product1!=null){
+            return new ResponseEntity<>("Updated",HttpStatus.OK);
+        }
+        else
+            return new  ResponseEntity<>("Failed to update",HttpStatus.BAD_REQUEST);
+
+    }
+
+
+    @DeleteMapping("/product/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable int id){
+        Product product=productService.getProductById(id);
+        if(product!=null){
+            productService.deleteProduct(id);
+            return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        }
+        else
+            return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
     }
 }
