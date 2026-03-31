@@ -5,6 +5,7 @@ import com.project.ecom_project.repo.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.util.RecyclerPool;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,5 +44,9 @@ public class ProductService {
 
     public void deleteProduct(int id) {
         productRepo.deleteById(id);
+    }
+
+    public List<Product> searchProducts(String keyword){
+        return productRepo.searchProducts(keyword);
     }
 }
